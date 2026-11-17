@@ -1,0 +1,24 @@
+# 태그(v1.0.0 등)를 올리면 releases/<태그>/ 의 파일로 GitHub Release 를 만든다.
+# 설치본은 https://github.com/cyw0904/naranworks-releases/releases/latest/download/update.json 을 12시간마다 읽어
+# 새 버전을 알리고, 같은 Release 의 설치 파일을 받게 한다(update.json 의 url 은 상대 주소).
+name: release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: GitHub Release 만들기
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          dir="releases/${GITHUB_REF_NAME}"
+          test -f "$dir/update.json"
+          files=$(find "$dir" -maxdepth 1 -type f ! -name NOTES.md | sort)
+          gh release create "$GITHUB_REF_NAME" $files \
+            --title "나란웍스 ${GITHUB_REF_NAME#v}" --notes-file "$dir/NOTES.md" --latest

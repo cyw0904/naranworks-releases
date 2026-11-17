@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "url": "NaranWorks-Setup-1.0.0.exe",
+  "sha256": "736ef3cad919e1e8dec43dec2fb869b15ab7f881773eae0437e5cef0b317689c",
+  "size": 79201557,
+  "published_at": "2026-11-18",
+  "notes": {
+    "ko": "나란웍스 1.0 — 첫 정식 버전. 인사평가, 외부 AI 연결(Claude·Gemini·GPT — 부가 기능), PC 메신저(그룹웨어 알림·Ctrl+Alt+N), 시작하기 점검표, 인사 기록, 결재·근태·메일·문서함·게시판·메신저 보완.",
+    "en": "NaranWorks 1.0 — first stable release: performance reviews, external AI (Claude, Gemini, GPT — add-on), PC messenger (groupware alerts, Ctrl+Alt+N), getting-started checklist, HR records, and upgrades across approvals, attendance, mail, drive, boards and messenger."
+  }
+}
