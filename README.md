@@ -18,3 +18,7 @@
 Release 설명의 SHA-256 과 받은 파일이 같은지 확인하세요(PowerShell: `Get-FileHash .\NaranWorks-Setup-1.0.0.exe`).
 
 사용 조건은 판매자와 맺은 사용권 계약을 따릅니다. 문의: 판매처(크몽 등)의 판매자 문의.
+
+## 새 판 올리기(판매자)
+
+`releases/vX.Y.Z/`(설치 파일·`update.json`·`NOTES.md`·매뉴얼 PDF)를 넣고 main 에 push 하면 워크플로가 가장 높은 판으로 Release 를 만든다(태그도). 같은 판을 다시 올리면 그 Release 를 지우고 새로 만든다.

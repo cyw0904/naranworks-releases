@@ -1,12 +1,17 @@
-# 태그(v1.0.0 등)를 올리면 releases/<태그>/ 의 파일로 GitHub Release 를 만든다.
+# main 에 releases/<판>/ 을 올리면(또는 워크플로를 고치면) 가장 높은 판 폴더의 파일로 GitHub Release 를 만든다.
+# 같은 판 Release 가 이미 있으면(초안 포함) 지우고 새로 만든다 — 매뉴얼만 고쳐 다시 올려도 된다. 태그는 Release 가 만든다.
 # 설치본은 https://github.com/cyw0904/naranworks-releases/releases/latest/download/update.json 을 12시간마다 읽어
 # 새 버전을 알리고, 같은 Release 의 설치 파일을 받게 한다(update.json 의 url 은 상대 주소).
 name: release
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
+    paths: ["releases/**", ".github/workflows/release.yml"]
 permissions:
   contents: write
+concurrency:
+  group: release
+  cancel-in-progress: false
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -17,14 +22,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          dir="releases/${GITHUB_REF_NAME}"
+          tag=$(ls releases | sort -V | tail -1)
+          dir="releases/${tag}"
           test -f "$dir/update.json"
           files=$(find "$dir" -maxdepth 1 -type f ! -name NOTES.md | sort)
-          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            # 같은 판을 다시 올림(매뉴얼 고침 등): 파일을 바꿔 끼우고 설명만 새로
-            gh release upload "$GITHUB_REF_NAME" $files --clobber --repo "$GITHUB_REPOSITORY"
-            gh release edit "$GITHUB_REF_NAME" --notes-file "$dir/NOTES.md" --latest --repo "$GITHUB_REPOSITORY"
-          else
-            gh release create "$GITHUB_REF_NAME" $files \
-              --title "나란웍스 ${GITHUB_REF_NAME#v}" --notes-file "$dir/NOTES.md" --latest
-          fi
+          for id in $(gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" --jq ".[] | select(.tag_name==\"${tag}\") | .id"); do
+            gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/${id}"
+          done
+          gh release create "$tag" $files --target "$GITHUB_SHA" \
+            --title "나란웍스 ${tag#v}" --notes-file "$dir/NOTES.md" --latest
