@@ -20,5 +20,11 @@ jobs:
           dir="releases/${GITHUB_REF_NAME}"
           test -f "$dir/update.json"
           files=$(find "$dir" -maxdepth 1 -type f ! -name NOTES.md | sort)
-          gh release create "$GITHUB_REF_NAME" $files \
-            --title "나란웍스 ${GITHUB_REF_NAME#v}" --notes-file "$dir/NOTES.md" --latest
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            # 같은 판을 다시 올림(매뉴얼 고침 등): 파일을 바꿔 끼우고 설명만 새로
+            gh release upload "$GITHUB_REF_NAME" $files --clobber --repo "$GITHUB_REPOSITORY"
+            gh release edit "$GITHUB_REF_NAME" --notes-file "$dir/NOTES.md" --latest --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$GITHUB_REF_NAME" $files \
+              --title "나란웍스 ${GITHUB_REF_NAME#v}" --notes-file "$dir/NOTES.md" --latest
+          fi
